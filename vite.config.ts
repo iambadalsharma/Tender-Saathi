@@ -6,16 +6,14 @@ import { sites } from "./build/sites-vite-plugin";
 
 const CLOUDFLARE_D1_DATABASE_NAME =
   process.env.CLOUDFLARE_D1_DATABASE_NAME || "tender-saathi-db";
-const CLOUDFLARE_D1_DATABASE_ID =
-  process.env.CLOUDFLARE_D1_DATABASE_ID ||
-  "00000000-0000-4000-8000-000000000000";
+const CLOUDFLARE_D1_DATABASE_ID = process.env.CLOUDFLARE_D1_DATABASE_ID;
 
 const { d1, r2 } = hostingConfig;
 
 const localBindingConfig = {
   main: "./worker/index.ts",
   compatibility_flags: ["nodejs_compat"],
-  d1_databases: d1
+  d1_databases: d1 && CLOUDFLARE_D1_DATABASE_ID
     ? [
         {
           binding: d1,

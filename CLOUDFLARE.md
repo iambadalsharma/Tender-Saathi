@@ -12,6 +12,12 @@ npx wrangler d1 create tender-saathi-db
 
 Copy the returned `database_id`.
 
+If you create the database in the Cloudflare dashboard instead:
+
+1. Go to Workers & Pages > D1 SQL Database.
+2. Create database named `tender-saathi-db`.
+3. Open the database and copy its Database ID.
+
 ## 2. Add GitHub Secrets
 
 Open GitHub repo settings for `iambadalsharma/Tender-Saathi`, then add:
@@ -21,6 +27,26 @@ Open GitHub repo settings for `iambadalsharma/Tender-Saathi`, then add:
 - `CLOUDFLARE_D1_DATABASE_ID`
 
 The API token needs permission to deploy Workers and manage D1.
+
+## 2a. If Using Cloudflare Dashboard Git Deployments
+
+Your failed deployment used the placeholder database ID:
+
+```text
+00000000-0000-4000-8000-000000000000
+```
+
+Fix it in Cloudflare:
+
+1. Open your Worker/Pages project.
+2. Go to Settings > Variables and Secrets.
+3. Add build/runtime variable `CLOUDFLARE_D1_DATABASE_ID` with the real D1 Database ID.
+4. Add `CLOUDFLARE_D1_DATABASE_NAME` with `tender-saathi-db`.
+5. Go to Settings > Bindings.
+6. Add D1 binding:
+   - Variable name: `DB`
+   - D1 database: `tender-saathi-db`
+7. Redeploy the latest commit.
 
 ## 3. Deploy
 
@@ -53,4 +79,3 @@ DB
 ## Auth Note
 
 Cloudflare D1 stores tender/order/customer records. It does not provide customer login by itself. The current app still uses Supabase Auth for email/password and mobile OTP unless we separately build Cloudflare-native authentication.
-
