@@ -73,3 +73,5 @@ Row Level Security is enabled so logged-in customers can access only their own d
 ## Cloudflare/D1 note
 
 `.openai/hosting.json` still declares D1 as `DB` for future Cloudflare-native storage, but the active customer auth path is now Supabase.
+
+For Cloudflare database and Worker deployment, see `CLOUDFLARE.md`.
