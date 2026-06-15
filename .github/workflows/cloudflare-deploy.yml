@@ -33,7 +33,8 @@ jobs:
         run: npm run build
 
       - name: Apply D1 schema
-        run: npx wrangler d1 execute "$CLOUDFLARE_D1_DATABASE_NAME" --remote --file=drizzle/0000_young_gladiator.sql
+        run: npx wrangler d1 execute "$CLOUDFLARE_D1_DATABASE_NAME" --remote --file=drizzle/0000_young_gladiator.sql --config dist/server/wrangler.json
+
 
       - name: Deploy Worker
         run: npx wrangler deploy --config dist/server/wrangler.json
