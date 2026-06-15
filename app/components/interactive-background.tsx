@@ -176,7 +176,7 @@ export function InteractiveBackground({ theme }: InteractiveBackgroundProps) {
         left: 0,
         width: "100vw",
         height: "100vh",
-        zIndex: -5,
+        zIndex: -1,
         pointerEvents: "none",
         display: "block",
       }}
