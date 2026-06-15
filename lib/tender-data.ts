@@ -7,6 +7,8 @@ export type CustomerProfile = {
 };
 
 export type TenderRow = {
+  id?: string;
+  custom_data?: Record<string, any>;
   serialNo: number;
   remarks: string;
   publishedDate: string;
@@ -34,6 +36,8 @@ export type TenderRow = {
 };
 
 export type OrderRow = {
+  id?: string;
+  custom_data?: Record<string, any>;
   serialNo: number;
   gemTenderReference: string;
   techSpecsReference: string;
@@ -54,6 +58,7 @@ export type OrderRow = {
   couriered: string;
   cracLink: string;
 };
+
 
 export const tenderColumns: Array<{ key: keyof TenderRow; label: string }> = [
   { key: "serialNo", label: "S. No" },
@@ -112,7 +117,12 @@ export const demoCustomer: CustomerProfile = {
   email: "owner@example.com",
 };
 
-export const serviceHighlights = [
+export const serviceHighlights: Array<{
+  title: string;
+  text: string;
+  titleHi?: string;
+  textHi?: string;
+}> = [
   {
     title: "Tender filing support",
     text: "Tender number, due date, EMD, pre-bid, quoted value aur status ek jagah manage hota hai.",
@@ -130,6 +140,7 @@ export const serviceHighlights = [
     text: "Simple Hindi-English labels, bade buttons aur due-day alerts se owner ko turant samajh aata hai.",
   },
 ];
+
 
 export const initialTenders: TenderRow[] = [
   {

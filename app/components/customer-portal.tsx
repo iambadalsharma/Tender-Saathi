@@ -485,10 +485,11 @@ function mapOrderToDb(o: any) {
 }
 
 function c(language: Language) {
-  return copy[language] as Record<string, string> & {
+  return (copy[language] as unknown) as Record<string, string> & {
     nav: Record<PublicPage, string>;
   };
 }
+
 
 function makeCustomerId(name: string, businessName: string) {
   const source = `${businessName || name || "Customer"}`.replace(/[^a-zA-Z0-9]/g, "");
@@ -2406,15 +2407,19 @@ function DashboardOverview({
           ["Total filed", stats.filed, CheckCircle2, "text-emerald-700"],
           ["Missed tenders", stats.missed, AlertTriangle, "text-red-700"],
           ["Pipeline value", formatCurrencyShort(pipelineValue), Target, "text-indigo-700"],
-        ].map(([label, value, Icon, tone]) => (
-          <article key={String(label)} className="rounded-lg border border-zinc-200 bg-white p-4">
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-sm font-semibold text-zinc-600">{label as string}</p>
-              <Icon className={`h-5 w-5 ${tone as string}`} />
-            </div>
-            <p className="mt-3 text-2xl font-semibold text-zinc-950">{String(value)}</p>
-          </article>
-        ))}
+        ].map(([label, value, Icon, tone]) => {
+          const IconComponent = Icon as IconType;
+          return (
+            <article key={String(label)} className="rounded-lg border border-zinc-200 bg-white p-4">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm font-semibold text-zinc-600">{label as string}</p>
+                <IconComponent className={`h-5 w-5 ${tone as string}`} />
+              </div>
+              <p className="mt-3 text-2xl font-semibold text-zinc-950">{String(value)}</p>
+            </article>
+          );
+        })}
+
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
@@ -3036,7 +3041,7 @@ export function CustomerPortal() {
     } else {
       const latest = data[0] as PaymentRecord;
       setLatestPayment(latest);
-      setPaymentStatus(latest.status);
+      setPaymentStatus(latest.status === "approved" ? "active" : latest.status);
     }
   }
 
@@ -3089,7 +3094,7 @@ export function CustomerPortal() {
 
   function handlePaymentSuccess(record: PaymentRecord) {
     setLatestPayment(record);
-    setPaymentStatus(record.status);
+    setPaymentStatus(record.status === "approved" ? "active" : record.status);
   }
 
   return (
