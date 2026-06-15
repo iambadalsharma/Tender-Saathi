@@ -1,8 +1,11 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;650&display=swap");
 
 :root {
   --background: #f7f8fb;
   --foreground: #18181b;
+  --font-noto-sans: "Noto Sans", sans-serif;
+  --font-ibm-plex-mono: "IBM Plex Mono", monospace;
   --glass-bg: rgba(255, 255, 255, 0.58);
   --glass-strong: rgba(255, 255, 255, 0.76);
   --glass-border: rgba(255, 255, 255, 0.72);
@@ -15,6 +18,7 @@
   --accent: #0f8f6d;
   --accent-2: #2563eb;
 }
+
 
 @theme inline {
   --color-background: var(--background);
