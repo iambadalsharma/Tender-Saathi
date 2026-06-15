@@ -1,4 +1,4 @@
-CREATE TABLE `customer_orders` (
+CREATE TABLE IF NOT EXISTS `customer_orders` (
 	`id` text PRIMARY KEY NOT NULL,
 	`customer_id` text NOT NULL,
 	`serial_no` integer NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE `customer_orders` (
 	FOREIGN KEY (`customer_id`) REFERENCES `customers`(`customer_id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE `customer_tenders` (
+CREATE TABLE IF NOT EXISTS `customer_tenders` (
 	`id` text PRIMARY KEY NOT NULL,
 	`customer_id` text NOT NULL,
 	`serial_no` integer NOT NULL,
@@ -55,7 +55,7 @@ CREATE TABLE `customer_tenders` (
 	FOREIGN KEY (`customer_id`) REFERENCES `customers`(`customer_id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE `customers` (
+CREATE TABLE IF NOT EXISTS `customers` (
 	`customer_id` text PRIMARY KEY NOT NULL,
 	`owner_name` text NOT NULL,
 	`business_name` text NOT NULL,
@@ -64,7 +64,7 @@ CREATE TABLE `customers` (
 	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE `tender_files` (
+CREATE TABLE IF NOT EXISTS `tender_files` (
 	`id` text PRIMARY KEY NOT NULL,
 	`tender_id` text NOT NULL,
 	`file_name` text NOT NULL,
@@ -73,3 +73,4 @@ CREATE TABLE `tender_files` (
 	`uploaded_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	FOREIGN KEY (`tender_id`) REFERENCES `customer_tenders`(`id`) ON UPDATE no action ON DELETE cascade
 );
+
