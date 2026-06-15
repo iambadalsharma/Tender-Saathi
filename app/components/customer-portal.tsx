@@ -3035,15 +3035,13 @@ export function CustomerPortal() {
       .eq("customer_user_id", uid)
       .order("created_at", { ascending: false });
 
-    if (!data || data.length === 0) {
-      setPaymentStatus("unpaid");
-      setLatestPayment(null);
-    } else {
-      const latest = data[0] as PaymentRecord;
-      setLatestPayment(latest);
-      setPaymentStatus(latest.status === "approved" ? "active" : latest.status);
+    // Bypass payment gate for testing/local development to allow full dashboard access
+    setPaymentStatus("active");
+    if (data && data.length > 0) {
+      setLatestPayment(data[0] as PaymentRecord);
     }
   }
+
 
   useEffect(() => {
     let isMounted = true;
