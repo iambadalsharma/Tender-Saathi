@@ -4,6 +4,9 @@ export type CustomerProfile = {
   businessName: string;
   phone: string;
   email: string;
+  subscriptionPlan?: "Free Demo" | "Starter" | "Pro" | "Enterprise";
+  trialStartDate?: string;
+  trialEndDate?: string;
 };
 
 export type TenderRow = {
@@ -57,6 +60,7 @@ export type OrderRow = {
   collectedOrNot: string;
   couriered: string;
   cracLink: string;
+  tenderFolder?: string;
 };
 
 
@@ -107,6 +111,7 @@ export const orderColumns: Array<{ key: keyof OrderRow; label: string }> = [
   { key: "collectedOrNot", label: "Collected or Not" },
   { key: "couriered", label: "Courriered" },
   { key: "cracLink", label: "CRAC Link" },
+  { key: "tenderFolder", label: "Linked Tender Folder" },
 ];
 
 export const demoCustomer: CustomerProfile = {

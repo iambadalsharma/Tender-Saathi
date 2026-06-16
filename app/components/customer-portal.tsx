@@ -54,6 +54,8 @@ import {
 import { supabase } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 import { InteractiveBackground } from "./interactive-background";
+import { AnalyticsDashboard } from "./analytics-dashboard";
+import { NotesModal } from "./notes-modal";
 
 type Language = "en" | "hi";
 type Theme = "light" | "dark";
@@ -341,25 +343,32 @@ const competitorRows = [
 
 const pricingPlans = [
   {
+    id: "plan-demo",
+    name: "Free Demo",
+    price: "Free for 30 days",
+    rawPrice: "0",
+    text: "All starter features included for 30 days to try the platform.",
+  },
+  {
     id: "plan-starter",
-    name: "Starter Desk",
+    name: "Starter Plan",
     price: "INR 4,999/mo",
     rawPrice: "4999",
-    text: "Small owners who need tender dates, folders, and basic order tracking.",
+    text: "Add unlimited tenders, custom columns, tender folders, document uploads.",
   },
   {
-    id: "plan-growth",
-    name: "Growth Desk",
+    id: "plan-pro",
+    name: "Pro Plan",
     price: "INR 11,999/mo",
     rawPrice: "11999",
-    text: "Teams that need alerts, quote analysis, task tracking, and monthly reports.",
+    text: "Track progress, assign folders on cloud, live document preview, notes & task assignment.",
   },
   {
-    id: "plan-managed",
-    name: "Managed Desk",
-    price: "INR 29,999/mo",
-    rawPrice: "29999",
-    text: "Full tender operations with document preparation, follow-up, and result analysis.",
+    id: "plan-enterprise",
+    name: "Enterprise Plan",
+    price: "Custom Price",
+    rawPrice: "0",
+    text: "Tender analytics dashboard, order data management, and dedicated account support.",
   },
 ];
 
@@ -1791,6 +1800,8 @@ function Dashboard({
     active: false,
     type: "tenders",
   });
+  const [isAddingTender, setIsAddingTender] = useState(false);
+  const [notesTarget, setNotesTarget] = useState<{ id: string; title: string; type: "tenders" | "orders" } | null>(null);
 
   const stats = useMemo(() => calculateDashboardStats(tenders), [tenders]);
   const t = c(language);
@@ -1978,6 +1989,15 @@ function Dashboard({
 
   async function handleAddTender(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (
+      customer.subscriptionPlan === "Free Demo" &&
+      customer.trialEndDate &&
+      new Date(customer.trialEndDate) < new Date()
+    ) {
+      alert("Your Free Demo has expired. Please upgrade your plan to add more tenders.");
+      return;
+    }
+
     const form = event.currentTarget;
     const formData = new FormData(form);
     const pdf = formData.get("pdfFile") as File | null;
@@ -1991,40 +2011,54 @@ function Dashboard({
     const folderName = safeFolderName(tenderNumber);
     const nextSerial = Math.max(...tenders.map((tender) => tender.serialNo), 0) + 1;
 
-    const newTender = {
+    // Create the tender object using all column keys from tenderColumns
+    const newTender: any = {
       customer_user_id: userId,
       serial_no: nextSerial,
       remarks: pdf?.name ? `PDF uploaded: ${pdf.name}` : "Added from tender number",
-      published_date: new Date().toISOString().slice(0, 10),
-      submission_end_date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10),
-      pre_bid_date: null,
-      pre_bid_location: "To update",
-      to_be_applied: "Decide",
-      not_applying_reason: "-",
-      applied: "No",
-      due_days: 14,
-      tender_number: tenderNumber,
-      tender_title: title,
-      consignee: "To update",
-      organisation: "To update",
-      location: "To update",
-      emd_value: "To update",
-      ra: "No",
-      tender_value: "To update",
-      our_quoted_value: "-",
-      result: "Pending",
-      winning_value: "-",
-      tender_link: "#",
-      current_status: "Live",
       folder_link: `/folders/${customer.customerId}/${folderName}`,
+      current_status: "Live",
       custom_data: {},
     };
+
+    // Populate standard columns
+    tenderColumns.forEach(col => {
+      const isCustom = col.key.startsWith("custom_");
+      const value = String(formData.get(col.key) || "");
+      
+      // Some standard mappings
+      if (!isCustom) {
+        if (col.key === "publishedDate") newTender.published_date = value || new Date().toISOString().slice(0, 10);
+        else if (col.key === "submissionEndDate") newTender.submission_end_date = value || new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+        else if (col.key === "tenderNumber") newTender.tender_number = tenderNumber;
+        else if (col.key === "tenderTitle") newTender.tender_title = title;
+        else if (col.key === "preBidDate") newTender.pre_bid_date = value || null;
+        else if (col.key === "preBidLocation") newTender.pre_bid_location = value || "To update";
+        else if (col.key === "toBeApplied") newTender.to_be_applied = value || "Decide";
+        else if (col.key === "notApplyingReason") newTender.not_applying_reason = value || "-";
+        else if (col.key === "applied") newTender.applied = value || "No";
+        else if (col.key === "dueDays") newTender.due_days = 14;
+        else if (col.key === "consignee") newTender.consignee = value || "To update";
+        else if (col.key === "organisation") newTender.organisation = value || "To update";
+        else if (col.key === "location") newTender.location = value || "To update";
+        else if (col.key === "emdValue") newTender.emd_value = value || "To update";
+        else if (col.key === "ra") newTender.ra = value || "No";
+        else if (col.key === "tenderValue") newTender.tender_value = value || "To update";
+        else if (col.key === "ourQuotedValue") newTender.our_quoted_value = value || "-";
+        else if (col.key === "result") newTender.result = value || "Pending";
+        else if (col.key === "winningValue") newTender.winning_value = value || "-";
+        else if (col.key === "tenderLink") newTender.tender_link = value || "#";
+      } else {
+        newTender.custom_data[col.key] = value || "";
+      }
+    });
 
     const { data, error } = await supabase.from("tenders").insert(newTender).select().single();
 
     if (data) {
       setTenders((current) => [mapDbToTender(data), ...current]);
       setActiveView("tenders");
+      setIsAddingTender(false);
       form.reset();
     } else {
       console.error("Failed to add tender to DB:", error?.message);
@@ -2295,7 +2329,7 @@ function Dashboard({
                   query={query}
                   pipelineValue={pipelineValue}
                   onQueryChange={setQuery}
-                  onAddTender={handleAddTender}
+                  onAddTenderOpen={() => setIsAddingTender(true)}
                   onDownloadTenderCsv={downloadTenderCsv}
                   onOpenTenders={() => setActiveView("tenders")}
                   visibleTenders={visibleTenders}
@@ -2304,6 +2338,7 @@ function Dashboard({
                   onDeleteRow={handleDeleteRow}
                   onAddRow={handleAddBlankRow}
                   onManageColumns={() => setColumnManagerConfig({ active: true, type: "tenders" })}
+                  onOpenNotes={(id, title) => setNotesTarget({ id, title, type: "tenders" })}
                 />
               ) : null}
 
@@ -2319,6 +2354,7 @@ function Dashboard({
                   onDeleteRow={handleDeleteRow}
                   onAddRow={handleAddBlankRow}
                   onManageColumns={() => setColumnManagerConfig({ active: true, type: "tenders" })}
+                  onOpenNotes={(id, title) => setNotesTarget({ id, title, type: "tenders" })}
                 />
               ) : null}
 
@@ -2331,6 +2367,7 @@ function Dashboard({
                   onDeleteRow={handleDeleteRow}
                   onAddRow={handleAddBlankRow}
                   onManageColumns={() => setColumnManagerConfig({ active: true, type: "orders" })}
+                  onOpenNotes={(id, title) => setNotesTarget({ id, title, type: "orders" })}
                 />
               ) : null}
 
@@ -2339,7 +2376,7 @@ function Dashboard({
               ) : null}
 
               {activeView === "analysis" ? (
-                <AnalysisView language={language} tenders={tenders} pipelineValue={pipelineValue} />
+                <AnalysisView language={language} tenders={tenders} orders={orders} pipelineValue={pipelineValue} />
               ) : null}
 
               {activeView === "alerts" ? <AlertsView language={language} /> : null}
@@ -2359,6 +2396,73 @@ function Dashboard({
           columns={columnManagerConfig.type === "tenders" ? tenderColumns : orderColumns}
           onClose={() => setColumnManagerConfig((c) => ({ ...c, active: false }))}
           onSave={handleColumnsSave}
+        />
+      )}
+      {isAddingTender && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/40 p-4 backdrop-blur-sm">
+          <form
+            onSubmit={handleAddTender}
+            className="glass-panel flex flex-col max-h-[85vh] w-full max-w-2xl bg-white p-5 shadow-2xl animate-fade-up"
+          >
+            <div className="flex items-center justify-between border-b border-zinc-200 pb-3 mb-4">
+              <h3 className="text-lg font-bold text-zinc-900 flex items-center gap-2">
+                <FilePlus2 className="h-5 w-5 text-emerald-700" />
+                Add New Tender
+              </h3>
+              <button type="button" onClick={() => setIsAddingTender(false)} className="text-zinc-500 hover:text-zinc-700">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto space-y-4 pr-2">
+              <div className="grid md:grid-cols-2 gap-4">
+                {tenderColumns.map((col) => (
+                  <label key={col.key} className="space-y-1 block">
+                    <span className="text-xs font-semibold text-zinc-700">{col.label}</span>
+                    <input
+                      name={col.key}
+                      type={col.key.toLowerCase().includes("date") ? "date" : "text"}
+                      className="h-9 w-full rounded border px-3 text-xs text-zinc-950 outline-none focus:border-emerald-600"
+                    />
+                  </label>
+                ))}
+              </div>
+              <label className="space-y-1 block pt-2 border-t border-zinc-200">
+                <span className="text-xs font-semibold text-zinc-700">Tender PDF Upload</span>
+                <input
+                  name="pdfFile"
+                  type="file"
+                  accept=".pdf"
+                  className="w-full rounded border border-dashed border-zinc-300 bg-zinc-50 px-3 py-2 text-xs text-zinc-700"
+                />
+              </label>
+            </div>
+
+            <div className="flex justify-end gap-2 border-t border-zinc-200 pt-3 mt-4">
+              <button
+                type="button"
+                onClick={() => setIsAddingTender(false)}
+                className="h-10 rounded border px-4 text-xs font-semibold hover:bg-zinc-100"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="h-10 rounded bg-emerald-700 px-4 text-xs font-semibold text-white hover:bg-emerald-800"
+              >
+                Save Tender & Create Folder
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {notesTarget && (
+        <NotesModal
+          resourceId={notesTarget.id}
+          resourceTitle={notesTarget.title}
+          resourceType={notesTarget.type}
+          onClose={() => setNotesTarget(null)}
         />
       )}
     </main>
@@ -2391,7 +2495,7 @@ function DashboardOverview({
   visibleTenders: TenderRow[];
   pipelineValue: number;
   onQueryChange: (value: string) => void;
-  onAddTender: (event: FormEvent<HTMLFormElement>) => void;
+  onAddTenderOpen: () => void;
   onDownloadTenderCsv: () => void;
   onOpenTenders: () => void;
   tenderColumns: ColumnConfig[];
@@ -2465,46 +2569,23 @@ function DashboardOverview({
           </div>
         </section>
 
-        <form onSubmit={onAddTender} className="rounded-lg border border-zinc-200 bg-white p-4">
-          <div className="flex items-center gap-2">
-            <FilePlus2 className="h-5 w-5 text-emerald-700" />
-            <h2 className="text-xl font-semibold text-zinc-950">{t.addTender}</h2>
+        <div className="rounded-lg border border-zinc-200 bg-white p-4 flex flex-col justify-center items-center gap-4 text-center">
+          <div className="flex flex-col items-center justify-center p-4 bg-emerald-50 rounded-full mb-2">
+            <FilePlus2 className="h-10 w-10 text-emerald-700" />
           </div>
-          <div className="mt-4 grid gap-3">
-            <label className="space-y-2">
-              <span className="text-sm font-semibold text-zinc-700">{t.tenderNumber}</span>
-              <input
-                name="tenderNumber"
-                placeholder="GEM/2026/B/00000"
-                className="h-11 w-full rounded-md border border-zinc-300 px-3 text-zinc-950 outline-none focus:border-zinc-950"
-              />
-            </label>
-            <label className="space-y-2">
-              <span className="text-sm font-semibold text-zinc-700">{t.tenderTitle}</span>
-              <input
-                name="tenderTitle"
-                placeholder={language === "hi" ? "PDF title blank ho to yahan add karein" : "Add title if PDF is blank"}
-                className="h-11 w-full rounded-md border border-zinc-300 px-3 text-zinc-950 outline-none focus:border-zinc-950"
-              />
-            </label>
-            <label className="space-y-2">
-              <span className="text-sm font-semibold text-zinc-700">{t.tenderPdf}</span>
-              <input
-                name="pdfFile"
-                type="file"
-                accept=".pdf"
-                className="w-full rounded-md border border-dashed border-zinc-300 bg-zinc-50 px-3 py-3 text-sm text-zinc-700"
-              />
-            </label>
+          <div>
+            <h2 className="text-xl font-semibold text-zinc-950">{t.addTender}</h2>
+            <p className="text-sm text-zinc-500 mt-1">Manually enter a tender or upload a PDF to automatically extract details.</p>
           </div>
           <button
-            type="submit"
+            type="button"
+            onClick={onAddTenderOpen}
             className="mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-emerald-700 px-4 text-sm font-semibold text-white hover:bg-emerald-800"
           >
-            <Upload className="h-4 w-4" />
-            {t.addAndFolder}
+            <Plus className="h-5 w-5" />
+            Add Tender Manually
           </button>
-        </form>
+        </div>
       </div>
 
       <section className="rounded-lg border border-zinc-200 bg-white p-4">
@@ -2560,7 +2641,7 @@ function DashboardOverview({
             Add Blank Row
           </button>
         </div>
-        <DataTable rows={visibleTenders} columns={tenderColumns} onCellSave={onCellSave} onDeleteRow={onDeleteRow} />
+        <DataTable rows={visibleTenders} columns={tenderColumns} onCellSave={onCellSave} onDeleteRow={onDeleteRow} onOpenNotes={onOpenNotes} />
       </section>
     </div>
   );
@@ -2638,7 +2719,7 @@ function TenderTable({
           />
         </label>
       </div>
-      <DataTable rows={tenders} columns={tenderColumns} onCellSave={onCellSave} onDeleteRow={onDeleteRow} />
+      <DataTable rows={tenders} columns={tenderColumns} onCellSave={onCellSave} onDeleteRow={onDeleteRow} onOpenNotes={onOpenNotes} />
     </section>
   );
 }
@@ -2659,6 +2740,7 @@ function OrderTable({
   onDeleteRow: (rowId: string) => Promise<void>;
   onAddRow: () => Promise<void>;
   onManageColumns: () => void;
+  onOpenNotes: (rowId: string, title: string) => void;
 }) {
   const t = c(language);
 
@@ -2688,18 +2770,21 @@ function OrderTable({
           </button>
         </div>
       </div>
-      <DataTable rows={orders} columns={orderColumns} onCellSave={onCellSave} onDeleteRow={onDeleteRow} />
-    </section>
+        <DataTable rows={orders} columns={orderColumns} onCellSave={onCellSave} onDeleteRow={onDeleteRow} onOpenNotes={onOpenNotes} />
+      </section>
+    </div>
   );
 }
 
 function AnalysisView({
   language,
   tenders,
+  orders,
   pipelineValue,
 }: {
   language: Language;
   tenders: TenderRow[];
+  orders: OrderRow[];
   pipelineValue: number;
 }) {
   const winReady = tenders.filter((tender) => tender.currentStatus === "Working" || tender.currentStatus === "Filed").length;
@@ -2718,6 +2803,10 @@ function AnalysisView({
           <MetricTile title="Win-ready tenders" value={String(winReady)} />
           <MetricTile title="Average fit score" value="72%" />
         </div>
+      </section>
+
+      <section>
+        <AnalyticsDashboard tenders={tenders} orders={orders} />
       </section>
 
       <section className="grid gap-4 lg:grid-cols-[1fr_1fr]">
@@ -2909,11 +2998,13 @@ function DataTable<T extends Record<string, any>>({
   columns,
   onCellSave,
   onDeleteRow,
+  onOpenNotes,
 }: {
   rows: T[];
   columns: ColumnConfig[];
   onCellSave: (rowId: string, colKey: string, newValue: string) => Promise<void>;
   onDeleteRow: (rowId: string) => Promise<void>;
+  onOpenNotes?: (rowId: string, title: string) => void;
 }) {
   return (
     <div className="overflow-x-auto w-full">
@@ -2959,7 +3050,18 @@ function DataTable<T extends Record<string, any>>({
                   </td>
                 );
               })}
-              <td className="px-3 py-3 align-middle">
+              <td className="px-3 py-3 align-middle flex items-center gap-3">
+                {onOpenNotes && (
+                  <button
+                    type="button"
+                    onClick={() => onOpenNotes(row.id, row.tenderTitle || row.organisation || "Item")}
+                    className="text-blue-600 hover:text-blue-800 font-semibold inline-flex items-center gap-1 text-xs"
+                    title="Notes"
+                  >
+                    <BookOpenCheck className="h-4 w-4" />
+                    Notes
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => void onDeleteRow(row.id)}
@@ -3038,6 +3140,21 @@ export function CustomerPortal() {
 
   async function checkPaymentStatus(uid: string) {
     setPaymentStatus("loading");
+    
+    // Fetch profile subscription data
+    const { data: profileData } = await supabase.from("customers").select("subscription_plan, trial_start_date, trial_end_date").eq("id", uid).single();
+    if (profileData) {
+      setCustomer((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          subscriptionPlan: profileData.subscription_plan || "Free Demo",
+          trialStartDate: profileData.trial_start_date,
+          trialEndDate: profileData.trial_end_date,
+        };
+      });
+    }
+
     const { data } = await supabase
       .from("payments")
       .select("*")
@@ -3050,7 +3167,6 @@ export function CustomerPortal() {
       setLatestPayment(data[0] as PaymentRecord);
     }
   }
-
 
   useEffect(() => {
     let isMounted = true;

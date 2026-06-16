@@ -9,6 +9,9 @@ create table if not exists public.customers (
   business_name text not null,
   phone text,
   email text,
+  subscription_plan text default 'Free Demo',
+  trial_start_date timestamptz default now(),
+  trial_end_date timestamptz default (now() + interval '30 days'),
   tender_columns jsonb, -- Dynamic column configurations for Tenders
   order_columns jsonb,  -- Dynamic column configurations for Orders
   created_at timestamptz not null default now(),
@@ -43,6 +46,7 @@ create table if not exists public.tenders (
   tender_link text,
   current_status text,
   folder_link text,
+  folder_id text, -- Unified folder ID
   custom_data jsonb default '{}'::jsonb, -- Custom spreadsheet columns data
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -71,6 +75,7 @@ create table if not exists public.orders (
   collected_or_not text,
   couriered text,
   crac_link text,
+  folder_id text, -- Link to the tender folder
   custom_data jsonb default '{}'::jsonb, -- Custom spreadsheet columns data
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -82,6 +87,7 @@ create table if not exists public.files (
   customer_user_id uuid not null references public.customers(id) on delete cascade,
   tender_id uuid references public.tenders(id) on delete cascade,
   order_id uuid references public.orders(id) on delete cascade,
+  folder_id text,
   folder_name text not null,
   file_name text not null,
   file_url text not null,
@@ -101,12 +107,24 @@ create table if not exists public.payments (
   updated_at timestamptz not null default now()
 );
 
+-- 5.5 Create notes table
+create table if not exists public.notes (
+  id uuid primary key default gen_random_uuid(),
+  customer_user_id uuid not null references public.customers(id) on delete cascade,
+  tender_id uuid references public.tenders(id) on delete cascade,
+  order_id uuid references public.orders(id) on delete cascade,
+  content text not null,
+  assigned_to text,
+  created_at timestamptz not null default now()
+);
+
 -- 6. Enable Row Level Security (RLS)
 alter table public.customers enable row level security;
 alter table public.tenders enable row level security;
 alter table public.orders enable row level security;
 alter table public.files enable row level security;
 alter table public.payments enable row level security;
+alter table public.notes enable row level security;
 
 -- 7. Define RLS Policies
 
@@ -147,3 +165,10 @@ create policy "Customers can read own payments" on public.payments for select us
 
 drop policy if exists "Customers can insert own payments" on public.payments;
 create policy "Customers can insert own payments" on public.payments for insert with check (auth.uid() = customer_user_id);
+
+-- Notes policies
+drop policy if exists "Customers can read own notes" on public.notes;
+create policy "Customers can read own notes" on public.notes for select using (auth.uid() = customer_user_id);
+
+drop policy if exists "Customers can manage own notes" on public.notes;
+create policy "Customers can manage own notes" on public.notes for all using (auth.uid() = customer_user_id) with check (auth.uid() = customer_user_id);
