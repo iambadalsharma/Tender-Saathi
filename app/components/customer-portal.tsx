@@ -887,44 +887,51 @@ function AuthDrawer({
               />
             </label>
           ) : null}
+          {mode === "signup" && (
+            <>
+              <label className="space-y-2">
+                <span className="text-sm font-semibold text-zinc-700">{t.ownerName}</span>
+                <input
+                  name="ownerName"
+                  placeholder="Rajesh Kumar"
+                  className="h-12 w-full rounded-md border border-zinc-300 px-3 text-zinc-950 outline-none focus:border-zinc-950"
+                />
+              </label>
 
-          <label className="space-y-2">
-            <span className="text-sm font-semibold text-zinc-700">{t.ownerName}</span>
-            <input
-              name="ownerName"
-              placeholder="Rajesh Kumar"
-              className="h-12 w-full rounded-md border border-zinc-300 px-3 text-zinc-950 outline-none focus:border-zinc-950"
-            />
-          </label>
-
-          <label className="space-y-2">
-            <span className="text-sm font-semibold text-zinc-700">{t.firmName}</span>
-            <input
-              name="businessName"
-              placeholder="RK Engineering Works"
-              className="h-12 w-full rounded-md border border-zinc-300 px-3 text-zinc-950 outline-none focus:border-zinc-950"
-            />
-          </label>
+              <label className="space-y-2">
+                <span className="text-sm font-semibold text-zinc-700">{t.firmName}</span>
+                <input
+                  name="businessName"
+                  placeholder="RK Engineering Works"
+                  className="h-12 w-full rounded-md border border-zinc-300 px-3 text-zinc-950 outline-none focus:border-zinc-950"
+                />
+              </label>
+            </>
+          )}
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="space-y-2">
-              <span className="text-sm font-semibold text-zinc-700">{t.mobile}</span>
-              <input
-                name="phone"
-                placeholder="9876543210"
-                className="h-12 w-full rounded-md border border-zinc-300 px-3 text-zinc-950 outline-none focus:border-zinc-950"
-              />
-            </label>
-            <label className="space-y-2">
-              <span className="text-sm font-semibold text-zinc-700">{t.email}</span>
-              <input
-                name="email"
-                type="email"
-                placeholder="owner@example.com"
-                required={authMethod === "email"}
-                className="h-12 w-full rounded-md border border-zinc-300 px-3 text-zinc-950 outline-none focus:border-zinc-950"
-              />
-            </label>
+            {(mode === "signup" || authMethod === "phone") && (
+              <label className="space-y-2">
+                <span className="text-sm font-semibold text-zinc-700">{t.mobile}</span>
+                <input
+                  name="phone"
+                  placeholder="9876543210"
+                  className="h-12 w-full rounded-md border border-zinc-300 px-3 text-zinc-950 outline-none focus:border-zinc-950"
+                />
+              </label>
+            )}
+            {(mode === "signup" || authMethod === "email") && (
+              <label className="space-y-2">
+                <span className="text-sm font-semibold text-zinc-700">{t.email}</span>
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="owner@example.com"
+                  required={authMethod === "email"}
+                  className="h-12 w-full rounded-md border border-zinc-300 px-3 text-zinc-950 outline-none focus:border-zinc-950"
+                />
+              </label>
+            )}
           </div>
 
           {authMethod === "email" ? (
