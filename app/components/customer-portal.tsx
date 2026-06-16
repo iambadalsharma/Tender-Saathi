@@ -2001,9 +2001,15 @@ function Dashboard({
     const form = event.currentTarget;
     const formData = new FormData(form);
     const pdf = formData.get("pdfFile") as File | null;
+    
+    if (!pdf || !pdf.name) {
+      alert("Uploading a tender PDF document is mandatory.");
+      return;
+    }
+
     const rawNumber = String(formData.get("tenderNumber") || "").trim();
     const tenderNumber = rawNumber || `TENDER-${Date.now().toString().slice(-6)}`;
-    const uploadedName = pdf?.name ? pdf.name.replace(/\.[^.]+$/, "") : "";
+    const uploadedName = pdf.name.replace(/\.[^.]+$/, "");
     const title =
       String(formData.get("tenderTitle") || "").trim() ||
       uploadedName.replace(/[-_]+/g, " ") ||
@@ -2433,6 +2439,7 @@ function Dashboard({
                   name="pdfFile"
                   type="file"
                   accept=".pdf"
+                  required
                   className="w-full rounded border border-dashed border-zinc-300 bg-zinc-50 px-3 py-2 text-xs text-zinc-700"
                 />
               </label>
