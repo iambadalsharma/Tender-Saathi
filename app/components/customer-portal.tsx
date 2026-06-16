@@ -2478,7 +2478,7 @@ function DashboardOverview({
   visibleTenders,
   pipelineValue,
   onQueryChange,
-  onAddTender,
+  onAddTenderOpen,
   onDownloadTenderCsv,
   onOpenTenders,
   tenderColumns,
@@ -2486,6 +2486,7 @@ function DashboardOverview({
   onDeleteRow,
   onAddRow,
   onManageColumns,
+  onOpenNotes,
 }: {
   language: Language;
   stats: ReturnType<typeof calculateDashboardStats>;
@@ -2503,6 +2504,7 @@ function DashboardOverview({
   onDeleteRow: (rowId: string) => Promise<void>;
   onAddRow: () => Promise<void>;
   onManageColumns: () => void;
+  onOpenNotes: (rowId: string, title: string) => void;
 }) {
   const t = c(language);
   const dueSoon = tenders
@@ -2658,6 +2660,7 @@ function TenderTable({
   onDeleteRow,
   onAddRow,
   onManageColumns,
+  onOpenNotes,
 }: {
   language: Language;
   tenders: TenderRow[];
@@ -2669,6 +2672,7 @@ function TenderTable({
   onDeleteRow: (rowId: string) => Promise<void>;
   onAddRow: () => Promise<void>;
   onManageColumns: () => void;
+  onOpenNotes: (rowId: string, title: string) => void;
 }) {
   const t = c(language);
 
@@ -2732,6 +2736,7 @@ function OrderTable({
   onDeleteRow,
   onAddRow,
   onManageColumns,
+  onOpenNotes,
 }: {
   language: Language;
   orders: OrderRow[];
@@ -2770,9 +2775,8 @@ function OrderTable({
           </button>
         </div>
       </div>
-        <DataTable rows={orders} columns={orderColumns} onCellSave={onCellSave} onDeleteRow={onDeleteRow} onOpenNotes={onOpenNotes} />
-      </section>
-    </div>
+      <DataTable rows={orders} columns={orderColumns} onCellSave={onCellSave} onDeleteRow={onDeleteRow} onOpenNotes={onOpenNotes} />
+    </section>
   );
 }
 
