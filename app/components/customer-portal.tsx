@@ -1383,7 +1383,7 @@ function PricingPage({
             Start free and upgrade when you need more power.
           </p>
         </div>
-        <div style={{ display: "grid", gap: 20, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
+        <div style={{ display: "grid", gap: 20 }} className="sm:grid-cols-2 lg:grid-cols-4" >
           {pricingPlans.map((plan, idx) => (
             <article
               key={plan.name}

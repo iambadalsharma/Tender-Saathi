@@ -130,19 +130,19 @@ export const serviceHighlights: Array<{
 }> = [
   {
     title: "Tender filing support",
-    text: "Tender number, due date, EMD, pre-bid, quoted value aur status ek jagah manage hota hai.",
+    text: "Manage tender number, due date, EMD, pre-bid, quoted value, and status tracking in one place.",
   },
   {
     title: "Order follow-up",
-    text: "Contract, BG, courier, CRAC aur pending work ka clear record team ke saamne rehta hai.",
+    text: "Track contracts, BG, courier, CRAC, and pending work with clear records visible to your entire team.",
   },
   {
     title: "Folder system",
-    text: "Har tender ka alag folder hota hai jahan documents, PDFs aur generated files ke links milte hain.",
+    text: "Every tender gets its own folder with documents, PDFs, and generated file links organized automatically.",
   },
   {
     title: "Owner-friendly dashboard",
-    text: "Simple Hindi-English labels, bade buttons aur due-day alerts se owner ko turant samajh aata hai.",
+    text: "Clean labels, large action buttons, and due-day alerts help business owners make decisions instantly.",
   },
 ];
 
