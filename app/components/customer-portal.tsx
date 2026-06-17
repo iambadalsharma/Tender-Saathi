@@ -137,7 +137,6 @@ const copy = {
     tagline: "Tender growth and order control desk",
     login: "Login",
     signup: "Sign up",
-    language: "Hindi",
     nav: {
       home: "Home",
       features: "Features",
@@ -188,6 +187,7 @@ const copy = {
     orderSummary: "Order summary",
     folderBase: "Base folder",
     files: "Files",
+    language: "Hindi",
   },
   hi: {
     brand: "Tender Saathi",
@@ -265,59 +265,46 @@ const growthCards = [
   {
     metric: "72%",
     title: "Tender fit score",
-    titleHi: "Tender fit score",
     text: "Best-fit opportunities are separated from risky bids before effort starts.",
-    textHi: "Risky bids aur best-fit opportunities ko kaam shuru hone se pehle alag dikhaya jata hai.",
     icon: Gauge,
     tone: "text-blue-700",
   },
   {
     metric: "3.4 Cr",
     title: "Open pipeline",
-    titleHi: "Open pipeline",
     text: "Expected value across working and upcoming tenders.",
-    textHi: "Working aur upcoming tenders ki expected value.",
     icon: Target,
     tone: "text-emerald-700",
   },
   {
     metric: "4",
     title: "Risk alerts",
-    titleHi: "Risk alerts",
     text: "EMD, BG, pre-bid and submission follow-up reminders.",
-    textHi: "EMD, BG, pre-bid aur submission follow-up reminders.",
     icon: AlertCircle,
     tone: "text-red-700",
   },
   {
     metric: "18%",
     title: "Quote gap",
-    titleHi: "Quote gap",
     text: "Difference between quoted value and known winning history.",
-    textHi: "Quoted value aur winning history ke beech ka gap.",
     icon: Lightbulb,
     tone: "text-amber-700",
   },
 ];
 
+
 const growthRecommendations = [
   {
     title: "Focus on municipal security tenders",
-    titleHi: "Municipal security tenders par focus karein",
     text: "Your active order history and documents match upcoming CCTV and command-center tenders.",
-    textHi: "Aapki order history aur documents upcoming CCTV aur command-center tenders se match karte hain.",
   },
   {
     title: "Reduce missed tender risk",
-    titleHi: "Missed tender risk kam karein",
     text: "Move EMD readiness and turnover checks to the first day after tender discovery.",
-    textHi: "Tender milte hi pehle din EMD readiness aur turnover check complete karein.",
   },
   {
     title: "Build a reusable compliance pack",
-    titleHi: "Reusable compliance pack banayein",
     text: "GST, PAN, turnover, OEM, BG and past-work files should be folder-ready for every tender.",
-    textHi: "GST, PAN, turnover, OEM, BG aur past-work files har tender folder me ready hone chahiye.",
   },
 ];
 
@@ -1025,9 +1012,7 @@ function profileFromSupabaseUser(user: User): CustomerProfile {
 }
 
 function PublicHome({
-  language,
   theme,
-  onLanguageToggle,
   onThemeToggle,
   onAuthOpen,
 }: {
@@ -1038,184 +1023,237 @@ function PublicHome({
   onAuthOpen: (mode: AuthMode) => void;
 }) {
   const [page, setPage] = useState<PublicPage>("home");
-  const t = c(language);
 
   return (
-    <main className="ios-shell min-h-screen text-zinc-950" data-theme={theme}>
-      <InteractiveBackground theme={theme} />
-      <header className="glass-nav sticky top-0 z-20 px-4 py-3 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="flex items-center gap-2 text-sm font-semibold text-emerald-700">
-                <Sparkles className="h-4 w-4" />
-                {t.brand}
-              </p>
-              <p className="text-xs text-zinc-500">{t.tagline}</p>
+    <main className="landing-shell min-h-screen">
+      {/* Premium Navbar */}
+      <header className="premium-nav sticky top-0 z-20 px-4 py-3 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+          {/* Logo */}
+          <div className="flex items-center gap-2.5">
+            <div style={{
+              width: 36, height: 36, borderRadius: 10,
+              background: "linear-gradient(135deg, #00d4aa, #3b82f6)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              boxShadow: "0 2px 12px rgba(0, 212, 170, 0.3)",
+            }}>
+              <Sparkles style={{ width: 18, height: 18, color: "#fff" }} />
             </div>
-            <div className="flex gap-2 lg:hidden">
-              <ThemeButton theme={theme} onToggle={onThemeToggle} />
-              <LanguageButton language={language} onToggle={onLanguageToggle} />
+            <div>
+              <p style={{ fontSize: 15, fontWeight: 700, color: "#0a1628", letterSpacing: "-0.02em", lineHeight: 1.2 }}>
+                Tender Saathi
+              </p>
+              <p style={{ fontSize: 11, color: "#64748b", fontWeight: 500, letterSpacing: "0.01em" }}>
+                Tender growth platform
+              </p>
             </div>
           </div>
 
-          <nav className="flex gap-1 overflow-x-auto rounded-md border border-zinc-200 bg-zinc-50 p-1">
+          {/* Navigation Pills */}
+          <nav className="premium-nav-pill hidden lg:flex">
             {publicPages.map((item) => (
               <button
                 key={item}
                 type="button"
                 onClick={() => setPage(item)}
-                className={`h-10 whitespace-nowrap rounded-md px-3 text-sm font-semibold ${
-                  page === item ? "bg-zinc-950 text-white" : "text-zinc-700 hover:bg-white"
-                }`}
+                className={page === item ? "active-tab" : ""}
               >
-                {t.nav[item]}
+                {item === "home" ? "Home" : item === "features" ? "Features" : item === "growth" ? "Growth Plan" : item === "pricing" ? "Plans" : "Resources"}
               </button>
             ))}
           </nav>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="hidden gap-2 lg:flex">
-              <ThemeButton theme={theme} onToggle={onThemeToggle} />
-              <LanguageButton language={language} onToggle={onLanguageToggle} />
-            </div>
+          {/* Actions */}
+          <div className="flex items-center gap-2">
+            <ThemeButton theme={theme} onToggle={onThemeToggle} />
             <button
               type="button"
               onClick={() => onAuthOpen("login")}
-              className="inline-flex h-10 items-center gap-2 rounded-md border border-zinc-300 bg-white px-3 text-sm font-semibold text-zinc-800 hover:bg-zinc-100"
+              style={{
+                height: 40, padding: "0 18px", borderRadius: 10,
+                border: "1px solid #e2e8f0", background: "white",
+                fontSize: 13, fontWeight: 600, color: "#0a1628",
+                display: "inline-flex", alignItems: "center", gap: 8,
+                transition: "all 200ms ease",
+              }}
             >
-              <LogIn className="h-4 w-4" />
-              {t.login}
+              <LogIn style={{ width: 15, height: 15 }} />
+              Login
             </button>
             <button
               type="button"
               onClick={() => onAuthOpen("signup")}
-              className="inline-flex h-10 items-center gap-2 rounded-md bg-emerald-700 px-3 text-sm font-semibold text-white hover:bg-emerald-800"
+              className="cta-primary"
+              style={{ height: 40, padding: "0 18px", fontSize: 13, borderRadius: 10 }}
             >
-              <UserPlus className="h-4 w-4" />
-              {t.signup}
+              <UserPlus style={{ width: 15, height: 15 }} />
+              Sign up
             </button>
           </div>
         </div>
+
+        {/* Mobile nav */}
+        <nav className="premium-nav-pill mt-3 flex lg:hidden overflow-x-auto">
+          {publicPages.map((item) => (
+            <button
+              key={item}
+              type="button"
+              onClick={() => setPage(item)}
+              className={page === item ? "active-tab" : ""}
+            >
+              {item === "home" ? "Home" : item === "features" ? "Features" : item === "growth" ? "Growth" : item === "pricing" ? "Plans" : "Resources"}
+            </button>
+          ))}
+        </nav>
       </header>
 
-      {page === "home" ? <PublicHomePage language={language} onAuthOpen={onAuthOpen} /> : null}
-      {page === "features" ? <FeaturePage language={language} /> : null}
-      {page === "growth" ? <GrowthPage language={language} onAuthOpen={onAuthOpen} /> : null}
-      {page === "pricing" ? <PricingPage language={language} onAuthOpen={onAuthOpen} /> : null}
-      {page === "resources" ? <ResourcesPage language={language} /> : null}
+      {page === "home" ? <PublicHomePage onAuthOpen={onAuthOpen} /> : null}
+      {page === "features" ? <FeaturePage /> : null}
+      {page === "growth" ? <GrowthPage onAuthOpen={onAuthOpen} /> : null}
+      {page === "pricing" ? <PricingPage onAuthOpen={onAuthOpen} /> : null}
+      {page === "resources" ? <ResourcesPage /> : null}
     </main>
   );
 }
 
 function PublicHomePage({
-  language,
   onAuthOpen,
 }: {
-  language: Language;
   onAuthOpen: (mode: AuthMode) => void;
 }) {
-  const t = c(language);
-
   return (
     <>
-      <section className="border-b border-zinc-200 bg-white px-4 py-10 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1fr_380px]">
-          <div className="max-w-4xl">
-            <p className="text-sm font-semibold uppercase text-blue-700">{t.heroLabel}</p>
-            <h1 className="mt-3 max-w-3xl text-4xl font-semibold text-zinc-950 sm:text-5xl">
-              {t.heroTitle}
+      {/* Hero Section */}
+      <section className="hero-section">
+        <div className="hero-orb hero-orb-1" />
+        <div className="hero-orb hero-orb-2" />
+        <div className="hero-orb hero-orb-3" />
+
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col items-center text-center">
+            <div className="section-label" style={{ marginBottom: 24 }}>
+              <Sparkles style={{ width: 14, height: 14 }} />
+              Tender Growth Platform
+            </div>
+
+            <h1 className="hero-headline">
+              Find, file, track &amp; <span className="accent-word">win more tenders</span> from one powerful dashboard.
             </h1>
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-zinc-600">{t.heroText}</p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={() => onAuthOpen("signup")}
-                className="inline-flex h-12 items-center gap-2 rounded-md bg-emerald-700 px-5 text-base font-semibold text-white hover:bg-emerald-800"
-              >
-                <UserPlus className="h-5 w-5" />
-                {t.primaryCta}
+
+            <p className="hero-subtitle" style={{ marginTop: 24 }}>
+              Tender Saathi keeps dates, documents, team work, orders, BG status, and growth analysis in one place — so business owners can act without confusion.
+            </p>
+
+            <div style={{ marginTop: 36, display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
+              <button type="button" onClick={() => onAuthOpen("signup")} className="cta-primary">
+                <UserPlus style={{ width: 18, height: 18 }} />
+                Start Free Trial
               </button>
-              <button
-                type="button"
-                onClick={() => onAuthOpen("login")}
-                className="inline-flex h-12 items-center gap-2 rounded-md border border-zinc-300 bg-white px-5 text-base font-semibold text-zinc-900 hover:bg-zinc-100"
-              >
-                <LogIn className="h-5 w-5" />
-                {t.secondaryCta}
+              <button type="button" onClick={() => onAuthOpen("login")} className="cta-secondary">
+                <LogIn style={{ width: 18, height: 18 }} />
+                Open Dashboard
               </button>
+            </div>
+
+            {/* Trust indicators */}
+            <div style={{
+              marginTop: 48, display: "flex", gap: 32, flexWrap: "wrap", justifyContent: "center",
+              fontSize: 13, color: "#64748b", fontWeight: 500,
+            }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                <CheckCircle2 style={{ width: 15, height: 15, color: "#00b894" }} />
+                No credit card required
+              </span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                <CheckCircle2 style={{ width: 15, height: 15, color: "#00b894" }} />
+                30-day free trial
+              </span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                <CheckCircle2 style={{ width: 15, height: 15, color: "#00b894" }} />
+                Unlimited tenders
+              </span>
             </div>
           </div>
-
-          <aside className="border-l-4 border-emerald-600 bg-emerald-50 p-5">
-            <p className="text-sm font-semibold uppercase text-emerald-800">Access</p>
-            <h2 className="mt-2 text-2xl font-semibold text-zinc-950">{t.sideTitle}</h2>
-            <p className="mt-3 text-sm leading-6 text-zinc-700">{t.sideText}</p>
-            <div className="mt-5 grid gap-2">
-              <button
-                type="button"
-                onClick={() => onAuthOpen("login")}
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-zinc-950 px-5 text-sm font-semibold text-white hover:bg-zinc-800"
-              >
-                <LogIn className="h-4 w-4" />
-                {t.login}
-              </button>
-              <button
-                type="button"
-                onClick={() => onAuthOpen("signup")}
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-md border border-emerald-300 bg-white px-5 text-sm font-semibold text-emerald-800 hover:bg-emerald-100"
-              >
-                <UserPlus className="h-4 w-4" />
-                {t.signup}
-              </button>
-            </div>
-          </aside>
         </div>
       </section>
 
-      <section className="px-4 py-10 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {/* Feature Cards */}
+      <section style={{ padding: "64px 0 80px" }}>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div style={{ textAlign: "center", marginBottom: 48 }}>
+            <div className="section-label" style={{ margin: "0 auto 16px" }}>
+              <ShieldCheck style={{ width: 14, height: 14 }} />
+              Core Features
+            </div>
+            <h2 className="section-heading">Everything you need to manage tenders</h2>
+            <p className="section-subheading" style={{ margin: "12px auto 0" }}>
+              From discovery to filing, order follow-up, and documents — the workflow stays simple and visible.
+            </p>
+          </div>
+
+          <div style={{ display: "grid", gap: 20, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
             {serviceHighlights.map((item) => (
-              <article key={item.title} className="rounded-lg border border-zinc-200 bg-white p-5">
-                <CheckCircle2 className="h-6 w-6 text-emerald-700" />
-                <h2 className="mt-4 text-lg font-semibold text-zinc-950">
-                  {language === "hi" ? item.titleHi ?? item.title : item.title}
-                </h2>
-                <p className="mt-2 text-sm leading-6 text-zinc-600">
-                  {language === "hi" ? item.textHi ?? item.text : item.text}
-                </p>
+              <article key={item.title} className="feature-card">
+                <div className="feature-card-icon">
+                  <CheckCircle2 style={{ width: 22, height: 22 }} />
+                </div>
+                <h2>{item.title}</h2>
+                <p>{item.text}</p>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="border-y border-zinc-200 bg-white px-4 py-10 sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[340px_1fr]">
-          <div>
-            <p className="text-sm font-semibold uppercase text-blue-700">{t.dashboardPreview}</p>
-            <h2 className="mt-2 text-3xl font-semibold text-zinc-950">{t.previewTitle}</h2>
-            <p className="mt-4 text-base leading-7 text-zinc-600">{t.previewText}</p>
-          </div>
-          <div className="overflow-hidden rounded-lg border border-zinc-200">
-            <div className="grid gap-px bg-zinc-200 sm:grid-cols-4">
-              {[
-                ["Live tender", "1"],
-                ["Upcoming", "1"],
-                ["Filed", "1"],
-                ["Missed", "1"],
-              ].map(([label, value]) => (
-                <div key={label} className="bg-white p-5">
-                  <p className="text-sm text-zinc-500">{label}</p>
-                  <p className="mt-2 text-3xl font-semibold text-zinc-950">{value}</p>
-                </div>
-              ))}
+      {/* Dashboard Preview Stats */}
+      <section style={{
+        padding: "64px 0 80px",
+        background: "linear-gradient(180deg, rgba(248, 250, 252, 0) 0%, rgba(241, 245, 249, 0.6) 100%)",
+      }}>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div style={{
+            display: "grid", gap: 32,
+            gridTemplateColumns: "1fr",
+          }} className="lg:grid-cols-[380px_1fr]">
+            <div style={{ maxWidth: 420 }}>
+              <div className="section-label" style={{ marginBottom: 16 }}>
+                <LayoutDashboard style={{ width: 14, height: 14 }} />
+                Dashboard Preview
+              </div>
+              <h2 className="section-heading" style={{ fontSize: "clamp(1.5rem, 2.5vw, 2rem)" }}>
+                What you see after login
+              </h2>
+              <p className="section-subheading" style={{ marginTop: 12 }}>
+                Tender counts, due dates, order follow-up, document folders, risk alerts, and growth recommendations — visible without extra training.
+              </p>
             </div>
-            <div className="bg-zinc-50 p-5">
-              <div className="grid gap-3 md:grid-cols-3">
-                {["Tender add", "Excel download", "Growth analysis"].map((label) => (
-                  <div key={label} className="rounded-md border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-700">
+            <div>
+              <div style={{ display: "grid", gap: 16, gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))" }}>
+                {[
+                  ["Live Tenders", "1"],
+                  ["Upcoming", "1"],
+                  ["Filed", "1"],
+                  ["Missed", "1"],
+                ].map(([label, value]) => (
+                  <div key={label} className="stat-card">
+                    <p className="stat-value">{value}</p>
+                    <p className="stat-label">{label}</p>
+                  </div>
+                ))}
+              </div>
+              <div style={{
+                display: "grid", gap: 12, gridTemplateColumns: "repeat(3, 1fr)",
+                marginTop: 16,
+              }}>
+                {["Tender Add", "Excel Download", "Growth Analysis"].map((label) => (
+                  <div key={label} style={{
+                    padding: "14px 16px", borderRadius: 12,
+                    background: "rgba(255, 255, 255, 0.5)",
+                    border: "1px solid rgba(226, 232, 240, 0.5)",
+                    fontSize: 13, fontWeight: 600, color: "#334155",
+                    textAlign: "center",
+                    backdropFilter: "blur(12px)",
+                  }}>
                     {label}
                   </div>
                 ))}
@@ -1228,7 +1266,7 @@ function PublicHomePage({
   );
 }
 
-function FeaturePage({ language }: { language: Language }) {
+function FeaturePage() {
   const featureRows = [
     ["Tender discovery", "Tender number, PDF, due date, EMD and pre-bid tracking."],
     ["Execution workflow", "To apply, not apply, applied, filed and missed stages with remarks."],
@@ -1239,25 +1277,28 @@ function FeaturePage({ language }: { language: Language }) {
   ];
 
   return (
-    <section className="px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl">
-        <div className="max-w-3xl">
-          <p className="text-sm font-semibold uppercase text-blue-700">Features</p>
-          <h1 className="mt-2 text-4xl font-semibold text-zinc-950">
-            {language === "hi" ? "Tender ka poora kaam ek jagah." : "Everything needed to run tender work in one place."}
+    <section style={{ padding: "64px 0 80px" }}>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div style={{ maxWidth: 640, marginBottom: 48 }}>
+          <div className="section-label" style={{ marginBottom: 16 }}>
+            <ShieldCheck style={{ width: 14, height: 14 }} />
+            Features
+          </div>
+          <h1 className="section-heading">
+            Everything needed to run tender work in one place.
           </h1>
-          <p className="mt-4 text-lg leading-8 text-zinc-600">
-            {language === "hi"
-              ? "Listing se lekar filing, order follow-up aur documents tak workflow simple rakha gaya hai."
-              : "From discovery to filing, order follow-up, and documents, the workflow stays simple and visible."}
+          <p className="section-subheading" style={{ marginTop: 12 }}>
+            From discovery to filing, order follow-up, and documents, the workflow stays simple and visible.
           </p>
         </div>
-        <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div style={{ display: "grid", gap: 20, gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))" }}>
           {featureRows.map(([title, text]) => (
-            <article key={title} className="rounded-lg border border-zinc-200 bg-white p-5">
-              <ShieldCheck className="h-6 w-6 text-emerald-700" />
-              <h2 className="mt-4 text-lg font-semibold text-zinc-950">{title}</h2>
-              <p className="mt-2 text-sm leading-6 text-zinc-600">{text}</p>
+            <article key={title} className="feature-card">
+              <div className="feature-card-icon">
+                <ShieldCheck style={{ width: 22, height: 22 }} />
+              </div>
+              <h2>{title}</h2>
+              <p>{text}</p>
             </article>
           ))}
         </div>
@@ -1267,51 +1308,51 @@ function FeaturePage({ language }: { language: Language }) {
 }
 
 function GrowthPage({
-  language,
   onAuthOpen,
 }: {
-  language: Language;
   onAuthOpen: (mode: AuthMode) => void;
 }) {
   return (
-    <section className="px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl">
-        <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
+    <section style={{ padding: "64px 0 80px" }}>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div style={{ display: "grid", gap: 40 }} className="lg:grid-cols-[0.8fr_1.2fr]">
           <div>
-            <p className="text-sm font-semibold uppercase text-emerald-700">Growth analysis</p>
-            <h1 className="mt-2 text-4xl font-semibold text-zinc-950">
-              {language === "hi" ? "Sirf tender list nahi, growth decision bhi." : "Not just a tender list, a growth decision desk."}
+            <div className="section-label" style={{ marginBottom: 16 }}>
+              <Target style={{ width: 14, height: 14 }} />
+              Growth Analysis
+            </div>
+            <h1 className="section-heading">
+              Not just a tender list, a growth decision desk.
             </h1>
-            <p className="mt-4 text-lg leading-8 text-zinc-600">
-              {language === "hi"
-                ? "Owner ko pata chale kaunsa tender apply karna hai, kaunsa avoid karna hai, aur kis kaam se win chance badhega."
-                : "Owners can see which tender to pursue, which one to avoid, and which action improves win chances."}
+            <p className="section-subheading" style={{ marginTop: 12 }}>
+              Owners can see which tender to pursue, which one to avoid, and which action improves win chances.
             </p>
             <button
               type="button"
               onClick={() => onAuthOpen("signup")}
-              className="mt-6 inline-flex h-12 items-center gap-2 rounded-md bg-emerald-700 px-5 text-base font-semibold text-white hover:bg-emerald-800"
+              className="cta-primary"
+              style={{ marginTop: 28 }}
             >
-              <UserPlus className="h-5 w-5" />
-              {language === "hi" ? "Growth dashboard shuru karein" : "Start growth dashboard"}
+              <UserPlus style={{ width: 18, height: 18 }} />
+              Start growth dashboard
             </button>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div style={{ display: "grid", gap: 16, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
             {growthCards.map((card) => {
               const Icon = card.icon;
               return (
-                <article key={card.title} className="rounded-lg border border-zinc-200 bg-white p-5">
-                  <div className="flex items-center justify-between gap-3">
-                    <Icon className={`h-6 w-6 ${card.tone}`} />
-                    <p className="text-3xl font-semibold text-zinc-950">{card.metric}</p>
+                <article key={card.title} className="feature-card">
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 12 }}>
+                    <div className="feature-card-icon" style={{ marginBottom: 0 }}>
+                      <Icon style={{ width: 22, height: 22 }} />
+                    </div>
+                    <span style={{ fontSize: "1.8rem", fontWeight: 800, color: "#0a1628", letterSpacing: "-0.02em" }}>
+                      {card.metric}
+                    </span>
                   </div>
-                  <h2 className="mt-5 text-lg font-semibold text-zinc-950">
-                    {language === "hi" ? card.titleHi : card.title}
-                  </h2>
-                  <p className="mt-2 text-sm leading-6 text-zinc-600">
-                    {language === "hi" ? card.textHi : card.text}
-                  </p>
+                  <h2>{card.title}</h2>
+                  <p>{card.text}</p>
                 </article>
               );
             })}
@@ -1323,34 +1364,57 @@ function GrowthPage({
 }
 
 function PricingPage({
-  language,
   onAuthOpen,
 }: {
-  language: Language;
   onAuthOpen: (mode: AuthMode) => void;
 }) {
   return (
-    <section className="px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl">
-        <div className="max-w-3xl">
-          <p className="text-sm font-semibold uppercase text-blue-700">Plans</p>
-          <h1 className="mt-2 text-4xl font-semibold text-zinc-950">
-            {language === "hi" ? "Customer size ke hisaab se simple plans." : "Simple plans by customer maturity."}
+    <section style={{ padding: "64px 0 80px" }}>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div style={{ maxWidth: 640, marginBottom: 48 }}>
+          <div className="section-label" style={{ marginBottom: 16 }}>
+            <CreditCard style={{ width: 14, height: 14 }} />
+            Plans
+          </div>
+          <h1 className="section-heading">
+            Simple plans by customer maturity.
           </h1>
+          <p className="section-subheading" style={{ marginTop: 8 }}>
+            Start free and upgrade when you need more power.
+          </p>
         </div>
-        <div className="mt-8 grid gap-4 lg:grid-cols-3">
-          {pricingPlans.map((plan) => (
-            <article key={plan.name} className="rounded-lg border border-zinc-200 bg-white p-5">
-              <h2 className="text-xl font-semibold text-zinc-950">{plan.name}</h2>
-              <p className="mt-3 text-3xl font-semibold text-emerald-700">{plan.price}</p>
-              <p className="mt-4 text-sm leading-6 text-zinc-600">{plan.text}</p>
+        <div style={{ display: "grid", gap: 20, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
+          {pricingPlans.map((plan, idx) => (
+            <article
+              key={plan.name}
+              className={`pricing-card ${idx === 2 ? "featured" : ""}`}
+            >
+              {idx === 2 && (
+                <div style={{
+                  position: "absolute", top: -1, left: "50%", transform: "translateX(-50%)",
+                  background: "linear-gradient(135deg, #00d4aa, #3b82f6)",
+                  color: "#fff", fontSize: 11, fontWeight: 700,
+                  padding: "4px 16px", borderRadius: "0 0 8px 8px",
+                  textTransform: "uppercase", letterSpacing: "0.05em",
+                }}>
+                  Popular
+                </div>
+              )}
+              <h2 style={{ fontSize: "1.15rem", fontWeight: 700, color: "#0a1628" }}>
+                {plan.name}
+              </h2>
+              <p className="price" style={{ marginTop: 12 }}>{plan.price}</p>
+              <p style={{ marginTop: 12, fontSize: "0.88rem", color: "#64748b", lineHeight: 1.6 }}>
+                {plan.text}
+              </p>
               <button
                 type="button"
                 onClick={() => onAuthOpen("signup")}
-                className="mt-6 inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-zinc-950 px-4 text-sm font-semibold text-white hover:bg-zinc-800"
+                className={idx === 2 ? "cta-primary" : "cta-secondary"}
+                style={{ marginTop: 20, width: "100%", justifyContent: "center" }}
               >
-                {language === "hi" ? "Plan choose karein" : "Choose plan"}
-                <ChevronRight className="h-4 w-4" />
+                Choose plan
+                <ChevronRight style={{ width: 16, height: 16 }} />
               </button>
             </article>
           ))}
@@ -1360,26 +1424,29 @@ function PricingPage({
   );
 }
 
-function ResourcesPage({ language }: { language: Language }) {
+function ResourcesPage() {
   return (
-    <section className="px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-7xl">
-        <div className="max-w-3xl">
-          <p className="text-sm font-semibold uppercase text-blue-700">Resources</p>
-          <h1 className="mt-2 text-4xl font-semibold text-zinc-950">
-            {language === "hi" ? "Owner aur team ke liye ready formats." : "Ready formats for owners and tender teams."}
+    <section style={{ padding: "64px 0 80px" }}>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div style={{ maxWidth: 640, marginBottom: 48 }}>
+          <div className="section-label" style={{ marginBottom: 16 }}>
+            <BookOpenCheck style={{ width: 14, height: 14 }} />
+            Resources
+          </div>
+          <h1 className="section-heading">
+            Ready formats for owners and tender teams.
           </h1>
-          <p className="mt-4 text-lg leading-8 text-zinc-600">
-            {language === "hi"
-              ? "Ye formats dashboard ke document folders me attach kiye ja sakte hain."
-              : "These formats can be attached inside dashboard document folders."}
+          <p className="section-subheading" style={{ marginTop: 12 }}>
+            These formats can be attached inside dashboard document folders.
           </p>
         </div>
-        <div className="mt-8 grid gap-4 md:grid-cols-2">
+        <div style={{ display: "grid", gap: 16, gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))" }}>
           {resources.map((resource) => (
-            <article key={resource} className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white p-5">
-              <BookOpenCheck className="h-6 w-6 text-emerald-700" />
-              <p className="font-semibold text-zinc-900">{resource}</p>
+            <article key={resource} className="feature-card" style={{ display: "flex", alignItems: "center", gap: 14, padding: "20px 24px" }}>
+              <div className="feature-card-icon" style={{ marginBottom: 0, flexShrink: 0 }}>
+                <BookOpenCheck style={{ width: 20, height: 20 }} />
+              </div>
+              <p style={{ fontWeight: 600, color: "#0a1628", fontSize: "0.95rem" }}>{resource}</p>
             </article>
           ))}
         </div>
@@ -2828,8 +2895,8 @@ function AnalysisView({
           <div className="mt-4 space-y-3">
             {growthRecommendations.map((item) => (
               <article key={item.title} className="rounded-lg border border-zinc-200 p-4">
-                <p className="font-semibold text-zinc-950">{language === "hi" ? item.titleHi : item.title}</p>
-                <p className="mt-1 text-sm leading-6 text-zinc-600">{language === "hi" ? item.textHi : item.text}</p>
+                <p className="font-semibold text-zinc-950">{item.title}</p>
+                <p className="mt-1 text-sm leading-6 text-zinc-600">{item.text}</p>
               </article>
             ))}
           </div>
